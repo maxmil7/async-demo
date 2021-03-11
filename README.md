@@ -14,7 +14,8 @@ node .
 + In the console, you'll notice the following statements printed out:
 
     ```
-    SpanID for example.com: ', 2fd4c74a87ccc888
-    SpanID for initial: ', 2fd4c74a87ccc888
+    SpanID for example.com: ', b005d94acc59cc36
+    SpanID for example.com: ', b005d94acc59cc36
+    SpanID for initial: ', b005d94acc59cc36
     ```
 

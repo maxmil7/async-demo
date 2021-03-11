@@ -28,14 +28,24 @@ function printCurrentSpanId(domain) {
 
 
 const app = require('express')();
-const fetch = require('node-fetch');
+const http = require('http');
 
-app.use(async function call(req, res, next) {
-    const r = await fetch('http://www.example.com');
-    printCurrentSpanId('example.com');
-    await r.text();
-    next();
-})
+app.use(function call(req, res, next) {
+
+    http.request({ host: 'www.example.com' }, function(response) {
+        let str = '';
+
+        response.on('data', function (chunk) {
+            printCurrentSpanId('example.com');
+            str += chunk;
+        });
+
+        response.on('end', function () {
+            next();
+        });
+    }).end();
+});
+
 
 app.get('/test', function(req, res) {
     printCurrentSpanId('initial');
