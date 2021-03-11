@@ -1,24 +1,20 @@
-# async-demo
-App to demo context mixup when Open telemetry library is used with wreck request library v12  
-Demo app is a simple express app which makes a downstream call to `example.com`  
-It has a middleware which makes a call to `github.com`
-Execution flow is as follows
-```
-App receives request -> Middleware calls github.com -> Request handler calls `example.com`
-```
+# no-span-context demo
+App to demo that outgoing http request spans are not set as active in context.  
+This app makes a request to `example.com` as part of middleware execution.  
+The issue is that the spanId in context is always of the root span.
 
 + To reproduce the issue, please execute the following steps
 ```
-git clone git@github.com:maxmil7/async-demo.git
+git clone git@github.com:maxmil7/async-demo.git -b no-context
 cd async-demo
 npm i
 node .
 ```
 + Navigate to http://localhost:7000/test
-+ In the console, you will see three spans create for the request
-    + Incoming request span for `/test`
-    + Outgoing request span for `github.com`
-    + Outgoing request span for `example.com`
++ In the console, you'll notice the following statements printed out:
 
-+ Ideally, both the outgoing request spans should be children of the incoming request span
-But the `example.com` span is a child of `github.com` span
+    ```
+    SpanID for example.com: ', 2fd4c74a87ccc888
+    SpanID for initial: ', 2fd4c74a87ccc888
+    ```
+

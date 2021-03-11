@@ -1,48 +1,46 @@
 
-const { SimpleSpanProcessor, ConsoleSpanExporter } = require('@opentelemetry/tracing');
 const { NodeTracerProvider } = require('@opentelemetry/node');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { SimpleSpanProcessor, ConsoleSpanExporter } = require('@opentelemetry/tracing');
+const { context, getSpanContext } = require('@opentelemetry/api');
 
-//Registering Otel provider
-const provider = new NodeTracerProvider({
-    plugins: {
-        express: { enabled: false }
-    }
+
+const provider = new NodeTracerProvider();
+
+registerInstrumentations({
+  tracerProvider: provider,
+  instrumentations: [
+      new HttpInstrumentation()
+  ]
+
 });
-provider.register();
+
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-    
-//Creating app 
+provider.register();
+
+
+
+function printCurrentSpanId(domain) {
+    const { spanId } = getSpanContext(context.active());
+    console.log(`SpanID for ${domain}: ', ${spanId}`);
+}
+
+
 const app = require('express')();
-const https = require('https');
-const Wreck = require('wreck');
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+const fetch = require('node-fetch');
 
-//Middleware uses wreck v12 to make a downstream request to github.com
-app.use((req, res, next) => {
-    Wreck.request('GET', 'https://github.com', {}, 
-    function (error, response) {
-        if (error) {
-            console.log(err.stack);
-            next(error);
-            return;
-        }
-        Wreck.read(response, null, function (error, body) {
-            if (error) {
-                next(error);
-                return;
-            }
-            response.body = body;
-            next();
-        });
-    })
-});
+app.use(async function call(req, res, next) {
+    const r = await fetch('http://www.example.com');
+    printCurrentSpanId('example.com');
+    await r.text();
+    next();
+})
 
-//Application makes downstream request to example.com
-app.get('/test', async (req, res) => {
-    https.request('https://www.example.com', (remote) => {
-        remote.pipe(res);
-    }).end();
-});
+app.get('/test', function(req, res) {
+    printCurrentSpanId('initial');
+    res.send('OK');
+})
 
 app.listen(7000, () => 'Server started listening');
 
