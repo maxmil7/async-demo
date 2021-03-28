@@ -1,9 +1,5 @@
-# no-span-context demo
-App to demo that outgoing http request spans are not set as active in context.  
-This app makes a request to `example.com` as part of middleware execution.  
-The issue is that the spanId in context is always of the root span.
-
-+ To reproduce the issue, please execute the following steps
+# Demo app
+Steps to reproduce issue:
 ```
 git clone git@github.com:maxmil7/async-demo.git -b no-context
 cd async-demo
@@ -14,8 +10,10 @@ node .
 + In the console, you'll notice the following statements printed out:
 
     ```
-    SpanID for example.com: ', b005d94acc59cc36
-    SpanID for example.com: ', b005d94acc59cc36
-    SpanID for initial: ', b005d94acc59cc36
+    Creating span for request undefined
+    Creating span for request /
+    Creating span for request /v1/trace
+    Creating span for request /v1/trace
+    Creating span for request /v1/trace
     ```
 

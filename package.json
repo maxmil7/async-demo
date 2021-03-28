@@ -9,10 +9,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@opentelemetry/api": "^0.18.1",
     "@opentelemetry/instrumentation-http": "^0.18.0",
-    "@opentelemetry/node": "^0.18.0",
-    "@opentelemetry/tracing": "^0.18.0",
+    "@splunk/otel": "^0.5.0",
     "express": "^4.17.1"
   }
 }
